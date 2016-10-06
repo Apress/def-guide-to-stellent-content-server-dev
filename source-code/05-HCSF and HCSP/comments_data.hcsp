@@ -1,0 +1,17 @@
+
+<html>
+<head>
+<!--$docLoadResourceIncludes("dDocName=comments_includes" join 
+       "&amp;RevisionSelectionMethod=Latest")-->
+<!--$include comments_form_head_declarations-->
+<!--$idcbegindata-->
+    <idcformrules resultsets="comment" />
+<!--$idcenddata-->
+</head>
+
+<!--$include comments_form_body-->
+
+</html>
+
+
+

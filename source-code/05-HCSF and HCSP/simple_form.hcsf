@@ -1,0 +1,75 @@
+
+<html>
+<head>
+
+<!--$include std_html_head_declarations-->
+
+<!--$idcbegindata-->
+<idcformrules resultsets="comment" />
+<formTitle></formTitle>
+<formData></formData>
+<!--$idcenddata-->
+</head>
+
+<!--$include body_def-->
+<!--$include std_page_begin-->
+
+<!--$c="Determine if this is the original HCSF or the HCSP, and if so
+		make every field read only. Otherwise, if its the original HCSF,
+		only make the date and author fields read only."-->
+<!--$if ref:dExtension like "hcsp" -->
+	<!--$isHcsp = 1-->
+	<h3>Submitted Data From Simple Form</h3>
+<!--$else-->
+	<h3>Simple Form</h3>
+
+	<p>This page will allow a user to fill out a form, and check the
+	data into the content server.</p>
+<!--$endif-->
+
+<form name="SimpleForm" method="POST" action="<!--$HttpCgiPath-->">
+<input type=hidden name="IdcService" value="SUBMIT_HTML_FORM">
+<input type=hidden name="dID" value="<!--$SourceID-->">
+<input type=hidden name="isFormFinished" value="1">
+<input type=hidden name="dSecurityGroup" value="Public">
+<input type=hidden name="FormDocTitleScript"
+	value="&lt;$UserName &amp; '-' &amp; formTitle$&gt;">
+<table>
+
+<!--$c="If this is the original HCSF, show a form, otherwise it is
+		a HCSP, so just show the data."-->
+<!--$if isHcsp-->
+	<tr>
+		<td>Title:</td>
+		<td><!--$formTitle--></td>
+	</tr>
+	<tr>
+		<td>Data:</td>
+		<td><!--$formData--></td>
+	</tr>
+<!--$else-->
+	<tr>
+		<td>Title:</td>
+		<td><input name="formTitle" size="50"></td>
+	</tr>
+	<tr>
+		<td>Data:</td>
+		<td><textarea name="formData" rows="8" cols="40"></textarea></td>
+	</tr>
+	<tr>
+		<td colspan=2 align=center>
+			<input type=submit>&nbsp;&nbsp;
+			<input type=reset>
+		</td>
+	</tr>
+<!--$endif-->
+</table>
+</form>
+
+<!--$include std_page_end-->
+
+</body>
+</html>
+
+
+

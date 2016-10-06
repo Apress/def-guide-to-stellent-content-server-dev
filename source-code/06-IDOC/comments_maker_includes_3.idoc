@@ -1,0 +1,301 @@
+
+<html>
+<head>
+</head>
+<body>
+<xmp>
+
+<!-- same as comments_maker_includes, but leverages different includes 
+	to show how to alter the HTML UI while still leveraging the core
+	includes -->
+
+<@dynamichtml comments_maker_form_head_declarations@>
+<$if title$>
+	<$PageTitle=title$>
+<$else$>
+	<$PageTitle="Comments Maker Form"$>
+<$endif$>
+
+<$isCheckin=1$>
+<$include std_doc_page_definitions$>
+<$include std_html_head_declarations$>
+<style TYPE="text/css">
+div.formRow {
+  clear: both;
+}
+div.formRow span.formCaption {
+  float: left;
+  width: 120px;
+  text-align: right;
+}
+div.formRow span.formEntry {
+  float: left;
+  text-align: left;
+  padding-left: 5px;
+}
+</style>
+<script>
+function deleteComment(form, num)
+{
+	form.elements["comment!author"].value = "";
+	form.elements["comment!author"].name = "comment!author#" + num;
+	form.elements["comment!title"].value = "";
+	form.elements["comment!title"].name = "comment!title#" + num;
+	form.elements["comment!date"].value = "";
+	form.elements["comment!date"].name = "comment!date#" + num;
+	form.elements["comment"].value = "";
+	form.elements["comment"].name = "comment#" + num;
+	form.submit();
+}
+</script>
+<@end@>
+
+
+<!-- the body of the comments maker form -->
+<@dynamichtml comments_maker_form_body@>
+<$include body_def$>
+<$include std_page_begin$>
+
+<$c="Determine if this is the original HCSF or the HCSP, and if so
+		make every field read only. Otherwise, if its the original HCSF,
+		only make the date and author fields read only."$>
+<$if ref:dExtension like "hcsp"$>
+	<$isHcsp = 1$>
+<$endif$>
+<$if isTrue(getValue("#active", "idcformrules:isFormFinished"))$>
+	<$isFormFinished=1$>
+<$endif$>
+
+<$if isHcsp$>
+	<h3>Comments Page</h3>
+<$else$>
+	<h3>Comments Page Creator</h3>
+
+	<p>This page will create a new discussion thread page based on some
+	information about a specific customer and product.</p>
+<$endif$>
+
+<form name="CommentsPageForm" method="POST" action="<$HttpCgiPath$>">
+<input type=hidden name="IdcService" value="SUBMIT_HTML_FORM">
+<input type=hidden name="dID" value="<$SourceID$>">
+<input type=hidden name="deletePost" value="">
+<table>
+
+	<tr>
+		<td colspan=2>
+<$fieldName="title", fieldCaption="<b>Discussion Title:</b>",
+	isInfoOnly=#active.isHcsp$>
+<$include std_display_field$>
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+<$fieldName="originalAuthor", fieldCaption="<b>Original Author:</b>", 
+	fieldValue=UserName, isInfoOnly=1$>
+<$include std_display_field$>
+		</td>
+		<td>
+<$fieldName="creationDate", fieldCaption="<b>Creation Date:</b>",
+	isInfoOnly=1, fieldValue=dateCurrent()$>
+<$include std_display_field$>
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+<$fieldName="customerName", fieldCaption="<b>Customer Name:</b>",
+	isInfoOnly=#active.isHcsp$>
+<$include std_display_field$>
+		</td>
+		<td>
+<$fieldName="productName", fieldCaption="<b>Product Name:</b>",
+	isInfoOnly=#active.isHcsp$>
+<$include std_display_field$>
+		</td>
+	</tr>
+
+	<tr>
+		<td colspan=2>
+<$fieldName="details", fieldCaption="<b>Details:</b>", fieldType="Memo",
+	isInfoOnly=#active.isHcsp$>
+<$include std_display_field$>
+		</td>
+	</tr>
+
+
+<$c="If this is the original HCSF, no comments exist yet, 
+		so dont show the comments section"$>
+<$if isHcsp$>
+
+	<tr>
+		<td colspan=2><hr></td>
+	</tr>
+	<tr>
+		<td colspan=2><h3>Comments:</h3></td>
+	</tr>
+	<tr>
+		<td colspan=2><hr></td>
+	</tr>
+
+<$isInfoOnly=1$>
+<$commentRowCount=0$>
+<$loop comment$>
+	<tr>
+		<td colspan=2><b><$comment!author$></b> [<$comment!date$>]</td>
+	</tr>
+	<tr>
+		<td colspan=2><b><$comment!title$></b></td>
+	</tr>
+	<tr>
+		<td colspan=2><$comment$></td>
+	</tr>
+	<tr>
+		<td colspan=2><input type="button" value="Delete Post"
+			onClick="deleteComment(this.form, <$commentRowCount$>);"></td>
+	</tr>	
+	<tr>
+		<td colspan=2><hr></td>
+	</tr>
+	<$commentRowCount = commentRowCount + 1$>
+<$endloop$>
+
+  <$if not isFormFinished$>
+	<$isInfoOnly="", isEditMode=1$>
+
+	<tr>
+		<td colspan=2>
+	<$fieldName="comment!author", fieldCaption="<b>Author:</b>", 
+		fieldValue=UserName, isInfoOnly=1$>
+	<$include std_display_field$>
+		</td>
+	</tr>
+	
+	<tr>
+		<td colspan=2>
+	<$fieldName="comment!title", fieldCaption="<b>Title:</b>"$>
+	<$include std_display_field$>
+		</td>
+	</tr>
+	
+	<tr>
+		<td colspan=2>
+	<$fieldName="comment", fieldCaption="<b>Comment:</b>", fieldType="Memo"$>
+	<$include std_display_field$>
+		</td>
+	</tr>
+
+	<$fieldName="comment!date", isHidden=1, fieldValue=dateCurrent()$>
+	<$include std_display_field$>
+	
+	<$fieldName="isFormFinished", isHidden=1, fieldValue=0$>
+	<$include std_display_field$>
+
+  <$endif$>
+
+<$endif$>
+
+<$if isFormFinished$>
+	<tr>
+		<td colspan=2>Discussion on this topic is now closed.</td>
+	</tr>
+<$else$>
+	<tr>
+		<td colspan=2><hr></td>
+	</tr>
+	<tr>
+		<td colspan=2 align=center>
+			<input type=submit value="Submit">&nbsp;&nbsp;
+			<input type=reset>&nbsp;&nbsp;
+			
+		<$c="If this is a HCSP, show a button to allow the discussion 
+				to be ended"$>
+		<$if isHcsp$>
+			<input type=button value="Close Discussion" 
+			onClick="this.form.isFormFinished.value=1; this.form.submit();">
+		<$endif$>
+		
+		</td>
+	</tr>
+<$endif$>
+</table>
+</form>
+
+<$include std_page_end$>
+
+</body>
+<@end@>
+
+
+<@dynamichtml std_nameentry_row@>
+<$include div_based_nameentry_row$>
+<@end@>
+
+
+<!-- this is a DIV based display of a field, so it is more portable 
+     when compared to the standard display field that is in a TR row -->
+<@dynamichtml div_based_nameentry_row@>
+<div id="<$#active.fieldName$>_div" class="formRow">
+	<span class="formCaption"><$strTrimWs(inc(fieldCaptionInclude))$></span>
+	<span class="formEntry"><$inc(fieldEntryInclude)$></span>
+</div>
+<@end@>
+
+
+<!-- mention how we want to modify how 'std_display_field' works, so we need
+     to take a peek at it first. Will cover more about this in next few
+     chapters about making components. The important includes we find are
+     'compute_std_field_includes' and 'show_std_field'. Checking the first one,
+     we see that 'defaultFieldInclude' is set to 'std_namevalue_field' in most
+     cases. This value will be set to 'fieldInclude' if nothing explicitly
+     overrides it with "xMyField:include" syntax. This value is then shown
+     in 'show_std_field'.
+     Checking out 'std_namevalue_field', we see that it includes 'std_nameentry_row',
+     which is the key! This is where the TR tags are created. So we need to
+     either overide how it works, or add a hook to whatever includes it so
+     we can alter behavior.
+     The correct thing to do in a component is to replace "include std_nameentry_row"
+     with "inc(fieldNameEntryRow)" and then set "fieldNameEntryRow='std_nameentry_row'"
+     somewhere in the overrides section. Then allow a flag to on the fly change that
+     include value. -->
+<@dynamichtml std_display_field@>
+<$exec inc("compute_std_field_includes")$>
+<$include show_std_field$>
+<@end@>
+
+<@dynamichtml show_std_field@>
+<$if isEditMode and not isUploadFieldScript$>
+	<$if not noSchema and (addEmptyOption or optionsAllowPreselect)$>
+	<script>
+	setFieldOption("<$js(fieldName)$>", "addEmptyOption", <$if addEmptyOption$>"1"<$else$>"0"<$endif$>)
+	setFieldOption("<$js(fieldName)$>", "allowPreselect", <$if optionsAllowPreselect$>"1"<$else$>"0"<$endif$>)
+	</script><$endif$>
+	<$header = getValue("#active", fieldName & ":groupHeader")$>
+	<$if header$><$include std_field_group_header$><$endif$>
+<$endif$>
+<$if not isFieldExcluded$><$inc(fieldInclude)$><$if isUploadFieldScript$><$include std_upload_validation$><$endif$><$endif$>
+<$exec inc("std_field_cleanup")$>
+<$if not getValue("#active", fieldName & ":isRelocated") and not isUploadFieldScript$><$include show_buddies$><$endif$>
+<@end@>
+
+<@dynamichtml std_namevalue_field@>
+<$if not isFieldHidden$><$include std_nameentry_row$><$endif$>
+<$if isFieldInfoOnly and isFormSubmit$>
+	<$hiddenFieldId = generateUniqueId(fieldName)$>
+	<input type=hidden id="<$hiddenFieldId$>" name="<$fieldName$>" value="<$xml(fieldValue)$>">
+	<$if hasOptionList and useSchema and not noSchema$>
+	<script language="JavaScript">
+		registerView("<$js(viewName)$>", "<$js(hiddenFieldId)$>", "<$js(fieldValue)$>");
+	</script>
+	<$endif$>
+<$endif$>
+<@end@>
+
+</xmp>
+</body>
+
+</html>
+
+
+
+

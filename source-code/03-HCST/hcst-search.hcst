@@ -1,0 +1,21 @@
+<html>
+<head>
+<title>Search</title>
+</head>
+<body>
+
+<h3>Test Documents</h3>
+
+<$if not QueryText$>
+<$QueryText="dDocTitle <substring> `test`"$>
+<$endif$>
+
+<$executeService("GET_SEARCH_RESULTS")$>
+<ul>
+<$loop SearchResults$>
+<li><a href="<$URL$>"><$dDocTitle$></a></li>
+<$endloop$>
+</ul>
+
+</body>
+</html>

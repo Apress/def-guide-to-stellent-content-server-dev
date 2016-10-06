@@ -1,0 +1,19 @@
+
+<html>
+<head>
+	<$PageTitle = "Check In Confirmation"$>
+	<$include std_html_head_declarations$>
+</head>
+<$include body_def$>
+<$include std_page_begin$>
+
+<h3>Check In Confirmation</h3>
+
+<p>Successfully checked in content item:
+<a href="<$HttpCgiPath$>?IdcService=DOC_INFO&dID=<$dID$>">
+	<$dDocName$></a></p>
+
+<$include std_page_end$>
+
+</body>
+</html>

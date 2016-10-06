@@ -1,0 +1,64 @@
+
+<html>
+<head>
+</head>
+<body>
+
+<@dynamichtml comments_form_head_declarations@>
+<$PageTitle="sample discussion thread", isNew=1$>
+<$include std_checkin_html_head_declarations$>
+<@end@>
+
+<@dynamichtml comments_form_body@>
+<$include body_def$>
+<$include std_page_begin$>
+
+<form name="SubmitThread" method="POST" action="<$HttpCgiPath$>">
+<input type=hidden name="IdcService" value="SUBMIT_HTML_FORM">
+<input type=hidden name="dID" value="<$SourceID$>">
+<table>
+<$isInfoOnly=1$>
+<$loop comment$>
+	<tr>
+		<td colspan=2><b><$comment!author$></b> [<$comment!date$>]</td>
+	</tr>
+	<tr>
+		<td colspan=2><b><$comment!title$></b></td>
+	</tr>
+	<tr>
+		<td colspan=2><$comment$></td>
+	</tr>
+	<tr>
+		<td colspan=2><hr></td>
+	</tr>
+<$endloop$>
+
+
+<$isInfoOnly="", isEditMode=1$>
+<$fieldName="comment!author", fieldCaption="<b>Author:</b>", 
+     fieldValue=UserName, isInfoOnly=1 $>
+<$include std_display_field$>
+
+<$fieldName="comment!title", fieldCaption="<b>Title:</b>"$>
+<$include std_display_field$>
+
+<$fieldName="comment", fieldCaption="<b>Comment:</b>", fieldType="Memo"$>
+<$include std_display_field$>
+
+<$fieldName="comment!date", isHidden=1, fieldValue=dateCurrent()$>
+<$include std_display_field$>
+
+	<tr>
+		<td colspan=2 align=center><input type=submit>&nbsp;&nbsp;
+		<input type=reset></td>
+	</tr>
+</table>
+</form>
+</body>
+<@end@>
+
+</body>
+</html>
+
+
+

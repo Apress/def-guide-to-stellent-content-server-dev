@@ -1,0 +1,224 @@
+
+<html>
+<head>
+<!--$if title-->
+    <!--$PageTitle=title-->
+<!--$else-->
+    <!--$PageTitle="Comments Maker Form"-->
+<!--$endif-->
+
+<!--$isCheckin=1-->
+<!--$include std_doc_page_definitions-->
+<!--$include std_html_head_declarations-->
+
+<script>
+var g_suffix = "";
+function resetFields(frm, index, comment, title, date, author)
+{
+    var field = frm.elements["comment" + g_suffix]
+    field.name = "comment#" + index;
+    field.value = comment;
+    var field = frm.elements["comment!title"  + g_suffix]
+    field.name = "comment!title#" + index;
+    field.value = title;
+    var field = frm.elements["comment!date" + g_suffix]
+    field.name = "comment!date#" + index;
+    field.value = date;
+    var field = frm.elements["comment!author" + g_suffix]
+    field.name = "comment!author#" + index;
+    field.value = author;
+    g_suffix = "#" + index;
+}
+function deleteFields(frm, index)
+{
+    resetFields(frm, index, "", "", "", "");
+    frm.submit();
+}
+function updateFields(frm, index, comment, title, date, author)
+{
+    resetFields(frm, index, comment, title, date, author);
+    frm.elements["Submit"].value = "Update Entry";
+}
+function sortFields(list)
+{
+    var index = list.selectedIndex;
+    if (index < 0)
+        return;
+    var sortField = list.options[index].value;
+    var newUrl = window.location.toString();
+
+    var extIndex = newUrl.indexOf(".hcsp");
+    newUrl = newUrl.substring(0, extIndex+5) +
+        "?SortField=" + sortField;
+    window.location.replace(newUrl);
+}
+</script>
+
+<!--$idcbegindata-->
+<idcformrules resultsets="comment" />
+<title></title>
+<originalAuthor></originalAuthor>
+<creationDate></creationDate>
+<customerName></customerName>
+<productName></productName>
+<details></details>
+<!--$idcenddata-->
+</head>
+
+<!--$include body_def-->
+<!--$include std_page_begin-->
+
+<!--$c="Determine if this is the original HCSF or the HCSP, and if so
+        make every field read only. Otherwise, if its the original HCSF,
+        only make the date and author fields read only."-->
+<!--$if ref:dExtension like "hcsp" -->
+    <!--$isHcsp = 1-->
+<!--$endif-->
+<!--$if isTrue(getValue("#active", "idcformrules:isFormFinished"))-->
+    <!--$isFormFinished=1-->
+<!--$endif-->
+
+<!--$if isHcsp -->
+    <h3>Comments Page</h3>
+<!--$else-->
+    <h3>Comments Page Creator</h3>
+
+    <p>This page will create a new discussion thread page based on some
+    information about a specific customer and product.</p>
+<!--$endif-->
+
+<form name="CommentsPageForm" method="POST" action="<!--$HttpCgiPath-->">
+<input type=hidden name="IdcService" value="SUBMIT_HTML_FORM">
+<input type=hidden name="dID" value="<!--$SourceID-->">
+<table>
+
+<!--$fieldName="originalAuthor", fieldCaption="<b>Original Author:</b>",
+    fieldValue=UserName, isInfoOnly=1 -->
+<!--$include std_display_field-->
+
+<!--$fieldName="title", fieldCaption="<b>Discussion Title:</b>",
+    isInfoOnly=#active.isHcsp-->
+<!--$include std_display_field-->
+
+<!--$fieldName="creationDate", fieldCaption="<b>Creation Date:</b>",
+    isInfoOnly=1, fieldValue=dateCurrent()-->
+<!--$include std_display_field-->
+
+<!--$fieldName="customerName", fieldCaption="<b>Customer Name:</b>",
+    isInfoOnly=#active.isHcsp -->
+<!--$include std_display_field-->
+
+<!--$fieldName="productName", fieldCaption="<b>Product Name:</b>",
+    isInfoOnly=#active.isHcsp -->
+<!--$include std_display_field-->
+
+<!--$fieldName="details", fieldCaption="<b>Details:</b>", fieldType="Memo",
+    isInfoOnly=#active.isHcsp -->
+<!--$include std_display_field-->
+
+
+<!--$c="If this is the original HCSF, no comments exist yet,
+        so dont show the comments section"-->
+<!--$if isHcsp-->
+
+    <tr>
+        <td colspan=2><hr></td>
+    </tr>
+    <tr>
+        <td colspan=2><h3>Comments:</h3></td>
+    </tr>
+    <tr>
+        <td colspan=2><hr></td>
+    </tr>
+
+<!--$if SortField-->
+    <!--$rsSort("comment", SortField)-->
+<!--$endif-->
+<!--$isInfoOnly=1, index=0 -->
+<!--$loop comment-->
+    <tr>
+        <td colspan=2><b><!--$comment!author--></b> [<!--$comment!date-->]</td>
+    </tr>
+    <tr>
+        <td colspan=2><b><!--$comment!title--></b></td>
+    </tr>
+    <tr>
+        <td colspan=2><!--$comment--></td>
+    </tr>
+    <tr>
+        <td colspan=2>
+            <input type="button" value="Delete This Entry"
+                onClick="deleteFields(this.form, <!--$index-->);">
+               <input type="button" value="Update This Entry"
+                   onClick="updateFields(this.form, <!--$index-->,
+                   '<!--$js(comment)-->',
+                   '<!--$js(comment!title)-->',
+                   '<!--$js(comment!date)-->',
+                   '<!--$js(comment!author)-->');">
+        </td>
+    </tr>
+    <tr>
+        <td colspan=2><hr></td>
+    </tr>
+    <!--$index = index + 1 -->
+<!--$endloop-->
+
+  <!--$if not isFormFinished-->
+    <!--$isInfoOnly="", isEditMode=1-->
+    <!--$fieldName="comment!author", fieldCaption="<b>Author:</b>",
+        fieldValue=UserName, isInfoOnly=1 -->
+    <!--$include std_display_field-->
+
+    <!--$fieldName="comment!title", fieldCaption="<b>Title:</b>"-->
+    <!--$include std_display_field-->
+
+    <!--$fieldName="comment", fieldCaption="<b>Comment:</b>", fieldType="Memo"-->
+    <!--$include std_display_field-->
+
+    <!--$fieldName="comment!date", isHidden=1, fieldValue=dateCurrent()-->
+    <!--$include std_display_field-->
+
+    <!--$fieldName="isFormFinished", isHidden=1, fieldValue=0-->
+    <!--$include std_display_field-->
+  <!--$endif -->
+
+<!--$endif -->
+
+<!--$if isFormFinished-->
+    <tr>
+        <td colspan=2>Discussion on this topic is now closed.</td>
+    </tr>
+<!--$else-->
+    <tr>
+        <td colspan=2 align=center>
+            <input type=submit name="Submit" value="Submit">&nbsp;&nbsp;
+            <input type=reset>&nbsp;&nbsp;
+
+        <!--$c="If this is a HCSP, show a button to allow the discussion
+                to be ended"-->
+        <!--$if isHcsp-->
+            <input type=button value="Close Discussion"
+            onClick="this.form.isFormFinished.value=1; this.form.submit();">
+            Sort By:
+            <select name="SortOrder" onChange="sortFields(this);">
+                <option>
+                <option value="comment">comment
+                <option value="comment!title">title
+                <option value="comment!date">date
+                <option value="comment!author">author
+            </select>
+        <!--$endif -->
+        </td>
+    </tr>
+<!--$endif-->
+
+</table>
+</form>
+
+<!--$include std_page_end-->
+
+</body>
+</html>
+
+
+

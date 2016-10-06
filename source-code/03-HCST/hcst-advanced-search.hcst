@@ -1,0 +1,92 @@
+
+<html>
+<head>
+<$PageTitle="Guest Search Page"$>
+<$if isTrue(IsLoggedIn)$>
+	<$PageTitle="Search Page For " & UserName$>
+<$endif$>
+<$include std_query_html_head_declarations$>
+<script language="JavaScript">
+<$include query_form_submit_script$>
+</script>
+</head>
+
+<$include body_def$>
+<$include std_page_begin$>
+
+<h3 class=pageTitle>HCST Search Page</h3>
+
+<form name="QUERYTEXTCOMPONENTS">
+<input type=hidden name="QueryText" value="">
+<table>
+<tr>
+	<td align=right><span class=searchLabel>Title</span></td>
+	<td>
+		<input type="hidden" name="opSelected"
+			value="hasAsSubstring">
+		<input type="text" size=30 name="dDocTitle"
+			value="">
+	</td>
+</tr>
+<tr>
+	<td align=right><span class=searchLabel>Content ID</span></td>
+	<td>
+		<input type="hidden" name="opSelected" value="hasAsSubstring">
+		<input type="text" size=30 name="dDocName" value="">
+	</td>
+</tr>
+<tr>
+	<td align=right><span class=searchLabel>Release
+		Date From</span></td>
+	<td align=left>
+		<input type="hidden" name="opSelected" Value="dateGE">
+		<input type="text" size=12 maxlength=20
+			name="dInDate" value="">
+		<span class=searchLabel>To</span>
+		<input type="hidden" name="opSelected" Value="dateLess">
+		<input type="text" size=12 maxlength=20
+			name="dInDate" value="">
+	</td>
+</tr>
+<tr>
+	<td align=right><span class=searchLabel>Full Text</span></td>
+	<td><input type="text" name="FullTextSearch" size=30></td>
+</tr>
+</table>
+</form>
+
+<$c="This page is hcst-advanced-search.hcst, and we wish to render the results with
+	the template hcst-advanced-search-results.hcst"$>
+<$urlTemplate = strSubstring(fileUrl, 0, strLength(fileUrl)-5)
+	& "-results.hcst"$>
+<form name="SEARCHFORM" method="GET"  action="<$HttpCgiPath$>">
+<input type=hidden name="IdcService" value="GET_SEARCH_RESULTS">
+<input type=hidden name="urlTemplate" value="<$urlTemplate$>">
+<input type=hidden name="QueryText" value="">
+<input type=hidden name="ResultCount" value="5">
+<input type=hidden name="ftx" value="">
+<table>
+<tr>
+	<td><span class=searchLabel>Sort By:</span></td>
+	<td><select name="SortField">
+		<option selected  value="dInDate">Release Date
+		<option  value="dDocTitle">Title
+		<option  value="Score">Score
+		</select>
+	</td>
+	<td><select name="SortOrder">
+		<option value="Asc">Ascending
+		<option selected value="Desc">Descending
+		</select>
+	</td>
+	<td>
+	<input type=submit value ="Search" onClick="submitFrm(false)">
+	</td>
+</tr>
+</table>
+</form>
+
+<$include std_page_end$>
+
+</body>
+</html>

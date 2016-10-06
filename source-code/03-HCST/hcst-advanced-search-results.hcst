@@ -1,0 +1,57 @@
+
+<html>
+<head>
+<$PageTitle="Guest Search Page"$>
+<$if isTrue(IsLoggedIn)$>
+	<$PageTitle="Search Page For " & UserName$>
+<$endif$>
+<$include searchapi_result_html_head_declarations$>
+</head>
+
+<$include body_def$>
+<$include std_page_begin$>
+
+<h3 class=pageTitle>HCST Search Results Page</h3>
+
+<p>Found <$TotalRows$> results.</p>
+
+<$c="You can also use the include searchapi_navigation_list"$>
+<p align="center">
+<$if PreviousPage$>
+[ <a href="<$strRemoveWs(inc("searchapi_navigation_previous"))$>">
+		PREV</a> ]
+<$endif$>
+<$if NextPage$>
+[ <a href="<$strRemoveWs(inc("searchapi_navigation_next_page"))$>">
+		NEXT</a> ]
+<$endif$>
+</p>
+
+<br><br>
+
+<table border='1' cellpadding='0' cellspacing='3' width='540'>
+<$loop SearchResults$>
+	<tr>
+	<td align='left'>
+		<a href='<$URL$>'><$dDocName$></a>
+	</td>
+	<td>
+		<b><$dDocTitle$></b><br>
+		Release Date: <$dInDate$><br>
+		Author: <$dDocAuthor$>
+	</td>
+	<td align='center' width='50'>
+		<a href='<$HttpCgiPath$>?IdcService=DOC_INFO&dID=<$dID$>'>
+		<img src='<$HttpWebRoot$>/images/stellent/InfoIcon_sm.gif'
+			border='0'>
+		</a>
+	</td>
+
+	</tr>
+<$endloop$>
+</table>
+
+<$include std_page_end$>
+
+</body>
+</html>

@@ -1,0 +1,17 @@
+
+<html>
+<head>
+<title>Search</title>
+</head>
+<body>
+
+<h3>Search Form</h3>
+
+<form action="search-results.hcst">
+<input name="QueryText" size="40"
+	value="dDocTitle <substring> `test`" />
+<input type="submit" value="Search" />
+</form>
+
+</body>
+</html>

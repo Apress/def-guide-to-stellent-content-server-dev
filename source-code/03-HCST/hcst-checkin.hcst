@@ -1,0 +1,106 @@
+<html>
+<head>
+	<$PageTitle="Check In", isNew=1, MultiUpload=false$>
+	<$include std_checkin_html_head_declarations$>
+</head>
+
+<$include body_def$>
+<$include std_page_begin$>
+
+<h3>HCST Check In</h3>
+
+<p>This check in page gives the HCST developer total control over which
+metadata fields to display, and how to format the HTML.</p>
+
+<form name="Checkin" method="post" enctype="multipart/form-data"
+	action="<$HttpCgiPath$>">
+
+<!-- prefilled default values... you can place other default
+     values here for metadata such as 'dDocType' and 'dSecurityGroup'
+     to make specialized contribution pages -->
+<input type=hidden name="IdcService" value="CHECKIN_NEW">
+<input type=hidden name="dDocAuthor" value="<$UserName$>">
+<input type=hidden name="dRevLabel" value="1">
+<input type=hidden name="dInDate" value="<$dateCurrent()$>">
+<input type=hidden name="dDocAccount" value="">
+
+<$c="This page is checkin.hcst, and we wish to redirect to the page
+	checkin-results.hcst after the checkin"$>
+<$redirectUrl = strSubstring(fileUrl, 0, strLength(fileUrl)-5) &
+	"-confirm.hcst?dDocName=<$dDocName$>&dID=<$dID$>"$>
+<input type=hidden name="RedirectUrl" value="<$redirectUrl$>">
+
+<table>
+
+<!-- This field is optional if auto numbering is turned on for the Stellent
+     Content Server.  -->
+<tr>
+	<td>Content ID</td>
+	<td><input type="text" name="dDocName" size=35 maxlength=30
+		value="">
+	</td>
+</tr>
+<tr>
+	<td>Type</td>
+	<td>
+		<select name="dDocType">
+		<$loop DocTypes$>
+			<option value="<$dDocType$>"><$dDescription$>
+		<$endloop$>
+		</select>
+	</td>
+</tr>
+<tr>
+	<td>Title</td>
+	<td><input type="text" name="dDocTitle" size=35	maxlength=30>
+	</td>
+</tr>
+<tr>
+	<td>Security Group</td>
+	<td>
+		<$rsMakeFromList("SecurityGroupSet", "securityGroups")$>
+		<select name="dSecurityGroup">
+		<$loop SecurityGroupSet$>
+			<option><$row$>
+		<$endloop$>
+		</select>
+	</td>
+</tr>
+<tr>
+	<td><hr></td><td><hr></td>
+</tr>
+<tr>
+	<td>File</td>
+	<td><input type="file" name="primaryFile" maxlength=250>
+	</td>
+</tr>
+
+<!-- custom metadata section -->
+<$loop DocMetaDefinition$>
+	<$showSimple=""$>
+	<$if showSimple$>
+		<tr>
+			<td><$lc(dCaption)$></td>
+			<td><input name="<$dName$>"></td>
+		</tr>
+	<$else$>
+		<$strTrimWs(inc("std_meta_field_display"))$>
+	<$endif$>
+<$endloop$>
+
+<tr>
+	<td><hr></td><td><hr></td>
+</tr>
+<tr>
+	<td align=center colspan=2>
+	<input type=button name=javaSubmit value=" Check In "
+		onClick="postCheckInStandard(this.form)">
+	<input type=reset name=reset value=" Reset ">
+	</td>
+</tr>
+</table>
+</form>
+
+<$include std_page_end$>
+</body>
+</html>

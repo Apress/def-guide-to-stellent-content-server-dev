@@ -1,0 +1,22 @@
+
+<html>
+<head>
+	<!--$include std_html_head_declarations-->
+</head>
+
+<!--$ if UserIsAdmin-->
+  <!--$docLoadResourceIncludes("dDocName=admin_portal_includes" join
+       "&amp;RevisionSelectionMethod=LatestReleased")-->
+<!--$ else -->
+  <!--$docLoadResourceIncludes("dDocName=user_portal_includes" join
+      "&amp;RevisionSelectionMethod=LatestReleased")-->
+<!--$ endif -->
+
+<!--$include body_def-->
+<!--$include std_page_begin-->
+
+<p>Content of the portal page</p>
+
+<!--$include std_page_end-->
+</body>
+</html>

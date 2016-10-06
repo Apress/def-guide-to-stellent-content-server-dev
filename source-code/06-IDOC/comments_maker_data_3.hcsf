@@ -1,0 +1,24 @@
+
+<html>
+<head>
+<!--$docLoadResourceIncludes("dDocName=comments_maker_includes_3" join 
+       "&amp;RevisionSelectionMethod=Latest")-->
+<!--$include comments_maker_form_head_declarations-->
+
+<!--$idcbegindata-->
+<idcformrules resultsets="comment" />
+<title></title>
+<originalAuthor></originalAuthor>
+<creationDate></creationDate>
+<customerName></customerName>
+<productName></productName>
+<details></details>
+<!--$idcenddata-->
+</head>
+
+<!--$include comments_maker_form_body-->
+
+</html>
+
+
+

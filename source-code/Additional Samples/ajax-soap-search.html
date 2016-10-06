@@ -1,0 +1,308 @@
+
+<html>
+<head>
+<title>Sample AJAX Search</title>
+<style TYPE="text/css">
+<!--
+/* colors: sand: e5e7d4, grey 5F5F5F, yellow c7c093, red 993300, sage b8cbc2 */
+BODY {	background-color : #ffffff;	color : #000000; font-family : Verdana, Arial, Tahoma, Helvetica, sans-serif; font-size : 10pt; margin-left : 1em; margin-right : 0; }
+A:LINK, A:VISITED { color : #5F5F5F;}
+A:HOVER { background-color : #e5e7d4; color : #5F5F5F; }
+H1 { color : #993300; font-size : 16pt; padding-bottom : 5px; padding-top : 5px; padding-left : 5px; }
+H3 { color : #993300; font-size : 12pt; margin-top :1em; }
+-->
+</style>
+<script>
+
+// change this variable to the HttpCgiPath for your server
+var httpCgiPath = "http://localhost/stellent/idcplg";
+var soapRequest;
+
+// run a search against the content server with SOAP, and
+// display the results on the same page. No browser refresh
+// will be required
+function runSoapRequest(form)
+{
+    // tell the user that the search is running
+    var resultsDiv = document.getElementById("searchResults");
+    resultsDiv.innerHTML = "running search...";
+
+    // this is a basic Search URL, with IsSoap appended
+    // so we get an XML response
+    var requestUrl = httpCgiPath +
+        "?IdcService=GET_SEARCH_RESULTS" +
+        "&QueryText=" + form.QueryText.value +
+        "&IsSoap=1";
+
+    // run the XMLHTTP request, and draw the response with
+    // the function 'drawSearchNodes'
+    loadXMLDoc(requestUrl, drawSearchNodes);
+
+    // stop the form from posting
+    return false;
+}
+
+// extract the search results from the XML response, and
+// draw them to the page
+function drawSearchNodes()
+{
+    // if the XML document isn't ready, do nothing
+    if (!checkXMLDoc())
+        return;
+
+    // the HTML string to draw to the page
+    var htmlStr = "<h3>Search Results</h3>";
+
+    // get the first idc:document object, which contains all the
+    // name-value pairs for the response
+    var docNodes = getIdcElementsByTagName(soapRequest.responseXML,
+        "document");
+    var localData = docNodes[0];
+
+    // obtain the number of total results
+    var totalRows = getSoapValue(localData, "TotalRows");
+    htmlStr += "Total Rows: " + totalRows + "<br>";
+
+    // obtain the SearchResults result set from the response
+    var searchResults = getSoapResultSet(soapRequest.responseXML,
+        "SearchResults");
+
+    htmlStr += "<ul>";
+    for (var i = 0; i < searchResults.childNodes.length; i++)
+    {
+        // only iterate over explicit XML node objects
+        var item = searchResults.childNodes[i];
+        if (item.nodeType == null || item.nodeType != 1)
+            continue;
+
+        // extract the title and comments from the current row
+        var title = getSoapValue(item, "dDocTitle");
+        var comments = getSoapValue(item, "xComments");
+
+        // append them to the string
+        htmlStr += "<li><b>" + title + ":</b><br>"
+            + comments + "</li>";
+    }
+
+    htmlStr += "</ul>";
+
+    // insert the string into the specific DIV
+    var resultsDiv = document.getElementById("searchResults");
+    resultsDiv.innerHTML = htmlStr;
+}
+
+// ------------------------------------------------------------------
+//  Utility functions for running a SOAP request
+// ------------------------------------------------------------------
+
+// This function creates a XMLHttpRequest object specific to the
+// browser, runs the web service, and processes the result.
+function loadXMLDoc(url, handleResponseFunction)
+{
+    soapRequest = false;
+
+    // try to create a native XMLHttpRequest object, works in
+    // Mozilla 1.0, Safari 1.2, Netscape 7, and Opera 7.60
+    if(window.XMLHttpRequest)
+    {
+        try
+        {
+            soapRequest = new XMLHttpRequest();
+        }
+        catch(e)
+        {
+            soapRequest = false;
+        }
+    }
+    // otherwise create an ActiveX object for Internet Explorer
+    else if(window.ActiveXObject)
+    {
+        try
+        {
+            soapRequest = new ActiveXObject("Msxml2.XMLHTTP");
+        }
+        catch(e)
+        {
+            try
+            {
+                  soapRequest = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            catch(e)
+            {
+                  soapRequest = false;
+            }
+        }
+    }
+
+    // if the object could be created, send a request
+    if(soapRequest)
+    {
+        // set the function to process state changes in the request
+        // so that the response will be drawn to the page only
+        // when its complete
+        soapRequest.onreadystatechange = handleResponseFunction;
+
+        // open the URL, and send an empty string to finish
+        // the request
+        try
+        {
+            soapRequest.open("GET", url, true);
+            if (soapRequest.readyState == 0)
+            {
+                throw 'Failed to open the connection';
+            }
+            soapRequest.send("");
+        }
+        catch (e)
+        {
+            alert(e + "\nUnable to open the XMLHTTP request.\n" +
+                "The server may be down, you may not have permission,\n" +
+                "or else you attempted to connect to a server other\n" +
+                "than the one hosting this page.");
+        }
+    }
+}
+
+// check to make sure the XMl document is fully loaded, and no
+// HTTP errors occurred.
+function checkXMLDoc()
+{
+    var isReady = false;
+    // only do something is the request state is "loaded"
+    if (soapRequest.readyState == 4)
+    {
+        // check the HTTP status for a successful connection
+        if (soapRequest.status == 200)
+        {
+            isReady = true;
+        }
+        else
+        {
+            // could be access denied, or a server error
+            alert("There was a problem retrieving the XML data:\n" +
+                soapRequest.statusText);
+        }
+    }
+    return isReady;
+}
+
+// ------------------------------------------------------------------
+//  Utility functions for extracting text from the SOAP response
+// ------------------------------------------------------------------
+
+// pull out a node from the XML doc by its name. This is needed
+// because of the different ways each browser handles XML namespaces
+function getIdcElementsByTagName(xmlDoc, nodeName)
+{
+    if (xmlDoc.getElementsByTagNameNS)
+    {
+        // for w3c compliant XML objects
+        return xmlDoc.getElementsByTagNameNS(
+            "http://www.stellent.com/IdcService/",
+            nodeName);
+    }
+    else
+    {
+        // for IE
+        return xmlDoc.getElementsByTagName("idc:" + nodeName);
+    }
+}
+
+// a helper function to extract a ResultSet from a SOAP response
+function getSoapResultSet(xmlDoc, rsetName)
+{
+    var allResultSets = getIdcElementsByTagName(xmlDoc, "resultset");
+
+    var rset = null;
+    for (var i=0; i<allResultSets.length; i++)
+    {
+        if (allResultSets[i].getAttribute("name") == rsetName)
+        {
+            rset = allResultSets[i];
+            break;
+        }
+    }
+    return rset;
+}
+
+// a helper function to extract an attritbute or a value from
+// an idc:field XML node
+function getSoapValue(xmlNode, name)
+{
+    // first, try pulling the value from the attributes
+    var value = xmlNode.getAttribute(name);
+    if (value == null)
+    {
+        // otherwise, loop over all the children looking for a
+        // node with the 'name' attribute set to the pased value
+        // for 'name'
+        for (var i=0; i<xmlNode.childNodes.length; i++)
+        {
+            var subNode = xmlNode.childNodes[i];
+
+            // skip nodes that are not full xml elementss
+            if (subNode.nodeType == null || subNode.nodeType != 1)
+            {
+                continue;
+            }
+
+            if (subNode.getAttribute("name") == name)
+            {
+                if (subNode.text)
+                    value = subNode.text;  // IE
+                else
+                    value = subNode.textContent; // Safari/Mozilla
+            }
+
+        }
+    }
+    return value;
+}
+</script>
+</head>
+<body>
+
+<h1>Search Results from JavaScript with AJAX</h1>
+
+<p>This page demonstrates how to execute a Content Server service with AJAX.
+It demonstrates how to execute a SOAP request with AJAX, parse the XML
+response, and dynamicly draw new HTML to the page. The search is executed
+without refreshing the page.</p>
+
+<p>This allows you to create web pages that contain a great deal of content
+without having to sacrifice performance. Since the additional AJAX data is
+loaded on demand, only users who request it will pay the performance penalty.</p>
+
+<h3>Install Steps</h3>
+
+<ul>
+<li>Change the JavaScript variable <b>httpCgiPath</b> to the HttpCgiPath
+	for your server.</li>
+<li>Check-in this HTML page into the Content Server.</li>
+<li>View the HTML page from the content server.</li>
+<li>Type a raw query text into the box below, and click <b>submit</b>
+	to run a SOAP search with AJAX.</li>
+</ul>
+
+<h3>Possible Modifications</h3>
+<ul>
+<li>Modify the function <b>drawSearchNodes</b> to draw the
+	search results differently.</li>
+<li>Modify the function <b>runSoapRequest</b> to execute a
+    different service, such as DOC_INFO or REVIEW_WORKFLOW_DOC</li>
+<li>All other functions are utility/support functions, and
+	need not be modified.</li>
+</ul>
+
+<h3>Sample Search Form</h3>
+
+<form name="search" onSubmit="runSoapRequest(this); return false;">
+<input name="QueryText" value="">
+<input type="submit">
+</form>
+
+<div id="searchResults">
+</div>
+
+</body>
+</html>

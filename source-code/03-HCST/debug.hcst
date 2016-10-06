@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title>debug page</title>
+	<$include std_html_head_declarations$>
+</head>
+<$include body_def$>
+<$include std_page_begin$>
+
+<p>This page is designed to demonstrate how to get a debug data dump
+from a content server request in a JSP.</p>
+
+<xmp style="text-align:left">
+Here is the result:
+
+Full Dump:
+
+<$trace("#all", "debugTrace")$>
+<$debugTrace$>
+</xmp>
+
+
+<$include std_page_end$>
+</body>
+</html>

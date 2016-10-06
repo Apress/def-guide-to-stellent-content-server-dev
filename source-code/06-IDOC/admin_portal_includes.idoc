@@ -1,0 +1,28 @@
+
+<html>
+<body>
+
+<@dynamichtml std_page_begin@>
+<table width="100%" cellpadding=0 cellspacing=0>
+<tr>
+	<td style="background:blue">&nbsp;
+	</td>
+	<td style="background:blue;color:white">
+		<h1>ADMIN PORTAL PAGE</h1>
+	</td>
+</tr>
+<tr>
+	<td style="color:blue">
+		link1<br>link2<br>link3<br>link4<br>link5
+	</td>
+	<td>
+<@end@>
+
+<@dynamichtml std_page_end@>
+	</td>
+</tr>
+</table>
+<@end@>
+
+</body>
+</html>

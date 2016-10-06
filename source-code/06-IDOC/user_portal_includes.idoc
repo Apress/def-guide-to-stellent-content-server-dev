@@ -1,0 +1,28 @@
+
+<html>
+<body>
+
+<@dynamichtml std_page_begin@>
+<table width="100%" cellpadding=0 cellspacing=0>
+<tr>
+	<td style="background:red">&nbsp;
+	</td>
+	<td style="background:red;color:white">
+		<h1>USER PORTAL PAGE</h1>
+	</td>
+</tr>
+<tr>
+	<td style="color:red">
+		link1<br>link2<br>link3<br>link4<br>link5
+	</td>
+	<td>
+<@end@>
+
+<@dynamichtml std_page_end@>
+	</td>
+</tr>
+</table>
+<@end@>
+
+</bocy>
+</html>

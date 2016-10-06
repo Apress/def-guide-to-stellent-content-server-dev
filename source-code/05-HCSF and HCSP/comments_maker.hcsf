@@ -1,0 +1,158 @@
+
+<html>
+<head>
+<!--$if title-->
+	<!--$PageTitle=title-->
+<!--$else-->
+	<!--$PageTitle="Comments Maker Form"-->
+<!--$endif-->
+
+<!--$isCheckin=1-->
+<!--$include std_doc_page_definitions-->
+<!--$include std_html_head_declarations-->
+
+<!--$idcbegindata-->
+<idcformrules resultsets="comment" />
+<title></title>
+<originalAuthor></originalAuthor>
+<creationDate></creationDate>
+<customerName></customerName>
+<productName></productName>
+<details></details>
+<!--$idcenddata-->
+</head>
+
+<!--$include body_def-->
+<!--$include std_page_begin-->
+
+<!--$c="Determine if this is the original HCSF or the HCSP, and if so
+		make every field read only. Otherwise, if its the original HCSF,
+		only make the date and author fields read only."-->
+<!--$if ref:dExtension like "hcsp" -->
+	<!--$isHcsp = 1-->
+<!--$endif-->
+<!--$if isTrue(getValue("#active", "idcformrules:isFormFinished"))-->
+	<!--$isFormFinished=1-->
+<!--$endif-->
+
+<!--$if isHcsp -->
+	<h3>Comments Page</h3>
+<!--$else-->
+	<h3>Comments Page Creator</h3>
+
+	<p>This page will create a new discussion thread page based on some
+	information about a specific customer and product.</p>
+<!--$endif-->
+
+<form name="CommentsPageForm" method="POST" action="<!--$HttpCgiPath-->">
+<input type=hidden name="IdcService" value="SUBMIT_HTML_FORM">
+<input type=hidden name="dID" value="<!--$SourceID-->">
+<table>
+
+<!--$fieldName="originalAuthor", fieldCaption="<b>Original Author:</b>", 
+	fieldValue=UserName, isInfoOnly=1 -->
+<!--$include std_display_field-->
+
+<!--$fieldName="title", fieldCaption="<b>Discussion Title:</b>",
+	isInfoOnly=#active.isHcsp-->
+<!--$include std_display_field-->
+
+<!--$fieldName="creationDate", fieldCaption="<b>Creation Date:</b>",
+	isInfoOnly=1, fieldValue=dateCurrent()-->
+<!--$include std_display_field-->
+
+<!--$fieldName="customerName", fieldCaption="<b>Customer Name:</b>",
+	isInfoOnly=#active.isHcsp -->
+<!--$include std_display_field-->
+
+<!--$fieldName="productName", fieldCaption="<b>Product Name:</b>",
+	isInfoOnly=#active.isHcsp -->
+<!--$include std_display_field-->
+
+<!--$fieldName="details", fieldCaption="<b>Details:</b>", fieldType="Memo",
+	isInfoOnly=#active.isHcsp -->
+<!--$include std_display_field-->
+
+
+<!--$c="If this is the original HCSF, no comments exist yet, 
+		so dont show the comments section"-->
+<!--$if isHcsp-->
+
+	<tr>
+		<td colspan=2><hr></td>
+	</tr>
+	<tr>
+		<td colspan=2><h3>Comments:</h3></td>
+	</tr>
+	<tr>
+		<td colspan=2><hr></td>
+	</tr>
+
+<!--$isInfoOnly=1 -->
+<!--$loop comment-->
+	<tr>
+		<td colspan=2><b><!--$comment!author--></b> [<!--$comment!date-->]</td>
+	</tr>
+	<tr>
+		<td colspan=2><b><!--$comment!title--></b></td>
+	</tr>
+	<tr>
+		<td colspan=2><!--$comment--></td>
+	</tr>
+	<tr>
+		<td colspan=2><hr></td>
+	</tr>
+<!--$endloop-->
+
+  <!--$if not isFormFinished-->
+	<!--$isInfoOnly="", isEditMode=1-->
+	<!--$fieldName="comment!author", fieldCaption="<b>Author:</b>", 
+		fieldValue=UserName, isInfoOnly=1 -->
+	<!--$include std_display_field-->
+
+	<!--$fieldName="comment!title", fieldCaption="<b>Title:</b>"-->
+	<!--$include std_display_field-->
+
+	<!--$fieldName="comment", fieldCaption="<b>Comment:</b>", fieldType="Memo"-->
+	<!--$include std_display_field-->
+
+	<!--$fieldName="comment!date", isHidden=1, fieldValue=dateCurrent()-->
+	<!--$include std_display_field-->
+
+	<!--$fieldName="isFormFinished", isHidden=1, fieldValue=0-->
+	<!--$include std_display_field-->
+  <!--$endif -->
+
+<!--$endif -->
+
+<!--$if isFormFinished-->
+	<tr>
+		<td colspan=2>Discussion on this topic is now closed.</td>
+	</tr>
+<!--$else-->
+	<tr>
+		<td colspan=2 align=center>
+			<input type=submit value="Submit">&nbsp;&nbsp;
+			<input type=reset>&nbsp;&nbsp;
+		
+		<!--$c="If this is a HCSP, show a button to allow the discussion 
+				to be ended"-->
+		<!--$if isHcsp-->
+			<input type=button value="Close Discussion" 
+			onClick="this.form.isFormFinished.value=1; this.form.submit();">
+		<!--$endif -->
+		
+		</td>
+	</tr>
+<!--$endif-->
+
+</table>
+</form>
+
+<!--$include std_page_end-->
+
+</body>
+</html>
+
+
+
